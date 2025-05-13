@@ -1,81 +1,147 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard</title>
-    <!-- Add Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-     <!-- Add Bootstrap Icons library -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RecruitNest</title>
+    
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
-        body {
-            background-color: #000000;
-            color: #ffffff;
+        .carousel-item {
+            height: 400px;
         }
 
-        .container {
+        .carousel-item img {
+            object-fit: cover;
+            height: 100%;
+        }
 
-            border-radius: 15px;
-            color: black;
+        .counter-section {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            padding: 100px 0;
+            color: white;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        }
+
+        .counter-box {
+            background: linear-gradient(135deg, #fff 0%, #e9f5ff 100%);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .counter-box:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .counter-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
             padding: 20px;
-            margin-top: 20px;
+            border-radius: 50%;
+            color: #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
         }
 
-
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+        .counter-number {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #333;
         }
 
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
+        .counter-title {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            font-weight: 500;
+            color: #555;
         }
 
-        .result-container {
-            background: #000000;
-            color: #ffffff;
-            margin-top: 20px;
+        .main-content {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 auto;
+            max-width: 1200px;
             padding: 20px;
-            border-radius: 15px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .dataframe-table {
+            min-width: 100%;
+            border-collapse: collapse;
+        }
+
+        .dataframe-table th,
+        .dataframe-table td {
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .dataframe-table th {
+            background-color: #f4f4f4;
+        }
+
+        @media (max-width: 768px) {
+            .counter-section {
+                padding: 70px 20px;
+                clip-path: none;
+            }
         }
     </style>
 </head>
 
 <body>
-  <!-- Navbar with attractive background and shadow effects -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-        <div class="container-fluid" style="background:#FCDCCB; height:70px;">
-            <a class="navbar-brand" href="#">HR Performance</a>
-            <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm" style="background: linear-gradient(to right, rgb(2, 23, 33), rgb(5, 13, 52)); height: 80px;">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold fs-3 text-white" href="#">
+                <i class="bi bi-people-fill me-2"></i>HR Panel
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/index" style="transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='orange';" onmouseout="this.style.backgroundColor='transparent';"><i class="bi bi-house-door"></i> Home</a>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link text-white fw-semibold px-3" href="/index"> <i class="bi bi-house-door me-1"></i> Home </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/job" style="transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='orange';" onmouseout="this.style.backgroundColor='transparent';"><i class="bi bi-briefcase"></i> Recruitment</a>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link text-white fw-semibold px-3" href="/job"> <i class="bi bi-briefcase me-1"></i> Recruitment </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/ana" style="transition: background-color 0.3s ease;" onmouseover="this.style.backgroundColor='orange';" onmouseout="this.style.backgroundColor='transparent';"><i class="bi bi-bar-chart"></i> Dashboard</a>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link text-white fw-semibold px-3" href="/ana"> <i class="bi bi-bar-chart me-1"></i> Dashboard </a>
+                    </li>
+                    <li class="nav-item mx-2">
+                        <a class="nav-link text-white fw-semibold px-3" href="/parse_resume"> <i class="bi bi-file-earmark-text me-1"></i> Resume Parser </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
+    <div class="container-fluid">
+        <div class="main-content">
+            <h2 class="mb-4">HR Analytics Dashboard</h2>
 
-
-
-    <div class="container mt-4" style="background: white; color: black; border-radius: 15px;">
-        <h1 class="text-center">HR Analytics Dashboard</h1>
-
-       <div class="row">
-            <div class="col-md-12">
-                <h3>Data Frame</h3>
-                <div style="overflow-x: auto; overflow-y: auto; max-height: 400px;">
-                    <table class="table table-striped">
+            <div class="card card-custom mb-4 w-100">
+                <div class="card-header">Data Frame</div>
+                <div class="card-body table-container">
+                    <table class="table table-striped table-bordered dataframe-table">
                         <thead>
                             <tr>
                                 {% for col in df.columns %}
@@ -95,24 +161,40 @@
                     </table>
                 </div>
             </div>
-        </div>
-        <hr>
 
-       <div class="row">
-           <div class="col-md-6">
-               <!-- Display additional variables below DataFrame -->
+            <div class="row g-3">
                 {% if average_satisfaction %}
-                <div class="row">
-                    <div class="col-md-12" style="box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; width:100%">
-                        <h3>Average Satisfaction Level: {{ average_satisfaction }}</h3>
+                <div class="col-md-4">
+                    <div class="card card-custom p-3">
+                        <h5>Average Satisfaction Level</h5>
+                        <p class="fs-4">{{ average_satisfaction }}</p>
                     </div>
                 </div>
                 {% endif %}
-               <br>
+
+                {% if left_employees %}
+                <div class="col-md-4">
+                    <div class="card card-custom p-3">
+                        <h5>Employees Who Left</h5>
+                        <p class="fs-4">{{ left_employees }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if stayed_employees %}
+                <div class="col-md-4">
+                    <div class="card card-custom p-3">
+                        <h5>Employees Who Stayed</h5>
+                        <p class="fs-4">{{ stayed_employees }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="row mt-4 g-3">
                 {% if department_satisfaction %}
-                <div class="row">
-                    <div class="col-md-12" style="box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; width:100%">
-                        <h3>Department-wise Average Satisfaction Level:</h3>
+                    <div class="card card-custom p-3">
+                        <h5>Department-wise Satisfaction</h5>
                         <ul>
                             {% for department, satisfaction in department_satisfaction.items() %}
                             <li>{{ department }}: {{ satisfaction }}</li>
@@ -121,113 +203,66 @@
                     </div>
                 </div>
                 {% endif %}
-               <br>
-                {% if salary_satisfaction %}
-                <div class="row">
-                    <div class="col-md-12" style="box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; width:100%">
-                        <h3>Salary-wise Average Satisfaction Level:</h3>
-                        <ul>
-                            {% for salary, satisfaction in salary_satisfaction.items() %}
-                            <li>{{ salary }}: {{ satisfaction }}</li>
-                            {% endfor %}
-                        </ul>
+            </div>
+
+            <div class="row mt-4 g-3">
+                <div class="col-md-6">
+                    <div class="card card-custom p-3">
+                        <h5>Left or Not Distribution</h5>
+                        <img src="{{ url_for('static', filename='left.png') }}" class="img-fluid">
                     </div>
                 </div>
-                {% endif %}
-               <br>
-                {% if left_employees %}
-                <div class="row">
-                    <div class="col-md-12" style="box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; width:100%">
-                        <h3>Employees who left:</h3>
-                        <ul>
-                            <li>{{ left_employees }}</li>
-                        </ul>
+                <div class="col-md-6">
+                    <div class="card card-custom p-3">
+                        <h5>Salary Distribution</h5>
+                        <img src="{{ url_for('static', filename='salary.png') }}" class="img-fluid">
                     </div>
                 </div>
-                {% endif %}
-               <br>
-                {% if stayed_employees %}
-                <div class="row">
-                    <div class="col-md-12" style="box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; width:100%">
-                        <h3>Employees who stayed:</h3>
-                        <ul>
-                            <li>{{ stayed_employees }}</li>
-                        </ul>
+                <div class="col-md-6">
+                    <div class="card card-custom p-3">
+                        <h5>Number of Projects Distribution</h5>
+                        <img src="{{ url_for('static', filename='number_project.png') }}" class="img-fluid">
                     </div>
                 </div>
-                {% endif %}
-
-                <!-- Add other additional variables as needed -->
-
-           </div>
-       </div>
-
-        <br>
-
-        <div class="row">
-            <div class="col-md-6">
-                <h3>Left or Not Distribution</h3>
-                <img src="{{ url_for('static', filename='left.png') }}" class="img-fluid" alt="Salary Distribution">
+                <div class="col-md-6">
+                    <div class="card card-custom p-3">
+                        <h5>Department Distribution</h5>
+                        <img src="{{ url_for('static', filename='department.png') }}" class="img-fluid">
+                    </div>
+                </div>
             </div>
-            <div class="col-md-6">
-                <h3>Salary Distribution</h3>
-                <img src="{{ url_for('static', filename='salary.png') }}" class="img-fluid" alt="Salary Distribution">
-            </div>
-        </div>
 
-
-        <div class="row">
-            <div class="col-md-6">
-                <h3>number_project Distribution</h3>
-                <img src="{{ url_for('static', filename='number_project.png') }}" class="img-fluid" alt="Salary Distribution">
-            </div>
-            <div class="col-md-6">
-                <h3>department Distribution</h3>
-                <img src="{{ url_for('static', filename='department.png') }}" class="img-fluid" alt="Salary Distribution">
-            </div>
-        </div>
-
-
-
-        <div class="row">
-             <div class="col-md-6">
-                <h3>Salary Histogram Distribution</h3>
-                <img src="{{ url_for('static', filename='salary_distribution.png') }}" class="img-fluid" alt="Department Distribution">
-            </div>
-            <div class="col-md-6">
-                <h3>Department Histogram Distribution</h3>
-                <img src="{{ url_for('static', filename='department_distribution.png') }}" class="img-fluid" alt="Department Distribution">
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6">
-                <h3>Department vs Satisfaction Level</h3>
-                 <img src="{{ url_for('static', filename='comparison.png') }}" class="img-fluid" alt="Correlation with Left">
-            </div>
-        </div>
-
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <h3>Correlation with Left</h3>
-                <img src="{{ url_for('static', filename='correlation.png') }}" class="img-fluid" alt="Correlation with Left">
-            </div>
-            <div class="col-md-6">
-                <h3>Histogram of Satisfaction Level</h3>
-                <img src="{{ url_for('static', filename='satisfaction_level_histogram.png') }}" class="img-fluid" alt="Histogram of Satisfaction Level">
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="card card-custom p-3">
+                        <h3>Salary Histogram Distribution</h3>
+                        <img src="{{ url_for('static', filename='salary_distribution.png') }}" class="img-fluid" alt="Salary Histogram Distribution">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card card-custom p-3">
+                        <h3>Department Histogram Distribution</h3>
+                        <img src="{{ url_for('static', filename='department_distribution.png') }}" class="img-fluid" alt="Department Histogram Distribution">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card card-custom p-3">
+                        <h3>Department vs Satisfaction Level</h3>
+                        <img src="{{ url_for('static', filename='comparison.png') }}" class="img-fluid" alt="Department vs Satisfaction">
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="card card-custom p-3">
+                        <h3>Correlation with Left</h3>
+                        <img src="{{ url_for('static', filename='correlation.png') }}" class="img-fluid" alt="Correlation with Left">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-
-
-
-
-    <!-- Add Bootstrap JS -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
