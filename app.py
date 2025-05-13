@@ -5,12 +5,32 @@ import seaborn as sns
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg') 
+import os
+from PyPDF2 import PdfReader
+import spacy
+import fitz 
+from sklearn.metrics import roc_curve
+from scipy.integrate import trapezoid
+import matplotlib.pyplot as plt
+import io
+import base64
 
-
+def extract_pdf_text(file_path):
+    text = ""
+    try:
+        pdf_reader = PdfReader(file_path)
+        for page_num in range(len(pdf_reader.pages)):
+            page = pdf_reader.pages[page_num]
+            text += page.extract_text()
+    except Exception as e:
+        print(f"Error reading PDF: {e}")
+    return text
 
 # ======================================Create app=================================================
 app = Flask(__name__)
-
+nlp = spacy.load('en_core_web_sm')
+UPLOAD_FOLDER = 'static/resumes'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # ======================================loading models and datasets================================
 df = pd.read_csv('notebook/HR_comma_sep.csv')
 model = pickle.load(open('models/model.pkl','rb'))
@@ -25,7 +45,19 @@ def reading_cleaning(df):
     return df
 #-----
 df = reading_cleaning(df)
+def evaluate_candidate(parsed_text):
+    keywords = ['Python', 'SQL', 'Data Science', 'Machine Learning', 'Flask', 'API', 'Django']
+    matched_keywords = [word for word in keywords if word.lower() in parsed_text.lower()]
+    score = len(matched_keywords)
 
+    if score >= 4:
+        match_level = "This candidate is a strong match for the job."
+    elif 2 <= score < 4:
+        match_level = "This candidate is a moderate match for the job."
+    else:
+        match_level = "This candidate may not be the best fit for the job."
+
+    return match_level, matched_keywords
 
 def employee_important_info(df):
     # Average satisfaction level
@@ -165,6 +197,74 @@ def ana():
 
 
 #prediction===============================================================
+@app.route('/parse_resume', methods=['GET', 'POST'])
+def parse_resume():
+    if request.method == 'POST':
+        if 'resume' not in request.files:
+            return "No file part"
+        
+        file = request.files['resume']
+        
+        if file.filename == '':
+            return "No selected file"
+        
+        if file:
+            if not os.path.exists(app.config['UPLOAD_FOLDER']):
+                os.makedirs(app.config['UPLOAD_FOLDER'])
+
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+            file.save(file_path)
+
+            # Extract text
+            extracted_text = extract_pdf_text(file_path)
+
+            # Evaluate candidate
+            evaluation_result, matched_keywords = evaluate_candidate(extracted_text)
+
+            # --- Simulate probability for ROC ---
+            total_keywords = 7  # You defined 7 job-related keywords
+            score = len(matched_keywords)
+            confidence = score / total_keywords
+
+            # --- Simulate actual label (manually or mock: assume good fit if ≥4 keywords) ---
+            actual = 1 if score >= 4 else 0
+
+            # --- Create ROC-like plot for this one sample ---
+            fpr = [0, 0.1, 1]
+            tpr = [0, confidence, 1]
+            auc_score = trapezoid(tpr, fpr)
+
+            # --- Plot and save ROC ---
+            plt.figure(figsize=(6, 6))
+            plt.plot(fpr, tpr, label=f'AUC = {auc_score:.2f}')
+            plt.plot([0, 1], [0, 1], 'k--', lw=2)
+            plt.xlabel('False Positive Rate')
+            plt.ylabel('True Positive Rate')
+            plt.title('Simulated ROC Curve for Resume')
+            plt.legend(loc='lower right')
+            plt.grid()
+
+            roc_path = os.path.join('static', 'resume_roc.png')
+            plt.savefig(roc_path)
+            plt.close()
+
+            # Preview extracted text
+            preview_text = extracted_text[:500]
+
+            return render_template(
+                'parse_result.html',
+                evaluation_result=evaluation_result,
+                matched_keywords=matched_keywords,
+                preview_text=preview_text,
+                auc_score=round(auc_score, 2),
+                roc_path=roc_path
+            )
+
+    return render_template('parse_resume.html')
+
+@app.route('/login')
+def login():
+    return render_template('Login.html')
 @app.route("/placement",methods=['POST','GET'])
 def placement():
     if request.method == 'POST':
@@ -194,5 +294,41 @@ def placement():
 
 # ========================python main===================================================
 if __name__ == "__main__":
+    from sklearn.model_selection import train_test_split
+    from sklearn.metrics import roc_curve, auc
+
+    # Prepare dataset (assuming df is cleaned and ready)
+    temp_df = df.copy()
+    temp_df['salary'] = temp_df['salary'].map({'low': 0, 'medium': 1, 'high': 2})
+    temp_df['department'] = temp_df['department'].astype('category').cat.codes
+
+    X = temp_df.drop('left', axis=1)
+    y = temp_df['left']
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Predict probabilities using your model
+    y_prob = model.predict_proba(X_test)[:, 1]
+
+    # Compute ROC curve and AUC
+    fpr, tpr, thresholds = roc_curve(y_test, y_prob)
+    roc_auc = auc(fpr, tpr)
+
+    print(f"\nROC AUC Score: {roc_auc:.4f}")
+
+    # Plot ROC Curve
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic (ROC)')
+    plt.legend(loc="lower right")
+    plt.tight_layout()
+    plt.savefig("static/roc_auc_curve.png")  # Save if needed
+    plt.savefig("static/roc_auc_curve.png")
+    print("ROC Curve saved as 'static/roc_auc_curve.png'")
 
     app.run(debug=True)
